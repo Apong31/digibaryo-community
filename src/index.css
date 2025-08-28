@@ -2,41 +2,79 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* DigiBaryo Design System - Filipino Community Platform
+All colors MUST be HSL. Glassmorphism and mobile-first design.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Main Background - Tropical gradient */
+    --background: 210 55% 98%;
+    --foreground: 215 25% 15%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Glassmorphism Cards */
+    --card: 220 15% 99%;
+    --card-foreground: 215 25% 15%;
+    --glass: 220 50% 96%;
+    --glass-border: 220 25% 85%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    /* Popover */
+    --popover: 220 15% 99%;
+    --popover-foreground: 215 25% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
+    /* Primary - Deep Ocean Blue (Trust & Community) */
+    --primary: 210 95% 45%;
+    --primary-light: 210 85% 65%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary - Warm Golden (Filipino Sun) */
+    --secondary: 45 95% 55%;
+    --secondary-light: 45 85% 70%;
+    --secondary-foreground: 45 30% 15%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Accent - Tropical Teal */
+    --accent: 175 85% 50%;
+    --accent-light: 175 75% 70%;
+    --accent-foreground: 175 30% 15%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Community Green */
+    --community: 145 75% 45%;
+    --community-light: 145 65% 65%;
+    --community-foreground: 145 30% 15%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Muted tones */
+    --muted: 215 15% 95%;
+    --muted-foreground: 215 15% 45%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* System colors */
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 40% 98%;
+    --success: 145 75% 45%;
+    --success-foreground: 145 30% 15%;
+    --warning: 35 95% 55%;
+    --warning-foreground: 35 30% 15%;
 
-    --radius: 0.5rem;
+    /* Borders and inputs */
+    --border: 220 25% 85%;
+    --input: 220 15% 99%;
+    --ring: 210 95% 45%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(210 95% 45%), hsl(175 85% 50%));
+    --gradient-secondary: linear-gradient(135deg, hsl(45 95% 55%), hsl(35 85% 65%));
+    --gradient-background: linear-gradient(135deg, hsl(210 55% 98%), hsl(175 45% 96%));
+    --gradient-glass: linear-gradient(135deg, hsl(220 50% 96% / 0.8), hsl(220 30% 95% / 0.6));
+
+    /* Shadows */
+    --shadow-glass: 0 8px 32px hsl(210 95% 45% / 0.1);
+    --shadow-elevated: 0 12px 40px hsl(210 95% 45% / 0.15);
+    --shadow-button: 0 4px 20px hsl(210 95% 45% / 0.2);
+
+    /* Transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    --radius: 1rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -101,5 +139,58 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    background: var(--gradient-background);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+}
+
+@layer components {
+  /* Glassmorphism utilities */
+  .glass {
+    @apply backdrop-blur-md bg-glass/80 border border-glass-border/50;
+    box-shadow: var(--shadow-glass);
+  }
+  
+  .glass-elevated {
+    @apply backdrop-blur-lg bg-glass/90 border border-glass-border/60;
+    box-shadow: var(--shadow-elevated);
+  }
+
+  /* Mobile-first containers */
+  .mobile-container {
+    @apply w-full max-w-md mx-auto px-4;
+  }
+
+  .mobile-padding {
+    @apply px-4 py-6;
+  }
+
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+
+  .transition-bounce {
+    transition: var(--transition-bounce);
+  }
+
+  /* Custom scrollbar */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary)) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--primary));
+    border-radius: 3px;
   }
 }
