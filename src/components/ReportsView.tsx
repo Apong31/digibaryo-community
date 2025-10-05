@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Filter, Plus } from 'lucide-react';
+import { Filter } from 'lucide-react';
 import { useReports } from '@/contexts/ReportsContext';
 import { ReportCard } from './ReportCard';
+import { AddReportDialog } from './AddReportDialog';
 
 export const ReportsView = () => {
   const { reports, filterReports } = useReports();
@@ -42,9 +43,7 @@ export const ReportsView = () => {
             {filteredReports.length} {filteredReports.length === 1 ? 'report' : 'reports'} found
           </p>
         </div>
-        <Button variant="glass" size="icon" className="rounded-full">
-          <Plus className="w-5 h-5" />
-        </Button>
+        <AddReportDialog />
       </div>
 
       {/* Filters */}
