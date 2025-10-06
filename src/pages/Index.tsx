@@ -6,6 +6,7 @@ import { Dashboard } from '@/components/Dashboard';
 import { ReportsView } from '@/components/ReportsView';
 import { SearchView } from '@/components/SearchView';
 import { ProfileView } from '@/components/ProfileView';
+import { AdminView } from '@/components/AdminView';
 import { Navigation } from '@/components/Navigation';
 
 const Index = () => {
@@ -39,6 +40,8 @@ const Index = () => {
         return <SearchView />;
       case 'profile':
         return <ProfileView />;
+      case 'admin':
+        return <AdminView />;
       default:
         return <Dashboard />;
     }

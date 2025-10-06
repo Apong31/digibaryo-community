@@ -1,6 +1,7 @@
-import { Home, FileText, User, LogOut, Search } from 'lucide-react';
+import { Home, FileText, User, LogOut, Search, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
 
 interface NavigationProps {
   currentView: string;
@@ -9,12 +10,14 @@ interface NavigationProps {
 
 export const Navigation = ({ currentView, onViewChange }: NavigationProps) => {
   const { logout } = useAuth();
+  const { isAdmin } = useUserRole();
 
   const navItems = [
     { id: 'dashboard', icon: Home, label: 'Home' },
     { id: 'reports', icon: FileText, label: 'Reports' },
     { id: 'search', icon: Search, label: 'Search' },
     { id: 'profile', icon: User, label: 'Profile' },
+    ...(isAdmin ? [{ id: 'admin', icon: Shield, label: 'Admin' }] : []),
   ];
 
   return (
