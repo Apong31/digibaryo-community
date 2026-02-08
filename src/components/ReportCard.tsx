@@ -69,6 +69,18 @@ export const ReportCard = ({ report }: ReportCardProps) => {
         </Badge>
       </div>
 
+      {/* Attached Image */}
+      {report.imageUrl && (
+        <div className="rounded-xl overflow-hidden mb-3 border border-border">
+          <img
+            src={report.imageUrl}
+            alt="Report attachment"
+            className="w-full h-32 object-cover"
+            loading="lazy"
+          />
+        </div>
+      )}
+
       {/* Description */}
       <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
         {report.description}

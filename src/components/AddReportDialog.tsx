@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,13 +7,52 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { useReports } from '@/contexts/ReportsContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus } from 'lucide-react';
+import { Plus, Camera, ImagePlus, X } from 'lucide-react';
 import { toast } from 'sonner';
+
+const MAX_IMAGE_SIZE = 800; // max dimension in px for compression
+
+const compressImage = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+
+        if (width > MAX_IMAGE_SIZE || height > MAX_IMAGE_SIZE) {
+          if (width > height) {
+            height = (height / width) * MAX_IMAGE_SIZE;
+            width = MAX_IMAGE_SIZE;
+          } else {
+            width = (width / height) * MAX_IMAGE_SIZE;
+            height = MAX_IMAGE_SIZE;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+      img.onerror = reject;
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
 
 export const AddReportDialog = () => {
   const { addReport } = useReports();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isCompressing, setIsCompressing] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -21,6 +60,37 @@ export const AddReportDialog = () => {
     priority: 'medium' as 'low' | 'medium' | 'high',
     location: '',
   });
+
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Image must be less than 10MB');
+      return;
+    }
+
+    try {
+      setIsCompressing(true);
+      const compressed = await compressImage(file);
+      setImagePreview(compressed);
+    } catch {
+      toast.error('Failed to process image');
+    } finally {
+      setIsCompressing(false);
+    }
+  };
+
+  const removeImage = () => {
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (cameraInputRef.current) cameraInputRef.current.value = '';
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +104,7 @@ export const AddReportDialog = () => {
       ...formData,
       status: 'pending',
       reportedBy: user?.name || user?.email || 'Anonymous',
+      imageUrl: imagePreview || undefined,
     });
 
     toast.success('Report submitted successfully!');
@@ -45,6 +116,7 @@ export const AddReportDialog = () => {
       priority: 'medium',
       location: '',
     });
+    setImagePreview(null);
   };
 
   return (
@@ -79,6 +151,71 @@ export const AddReportDialog = () => {
               placeholder="Provide detailed information about the issue"
               rows={4}
               required
+            />
+          </div>
+
+          {/* Image Attachment */}
+          <div className="space-y-2">
+            <Label>Attach Photo</Label>
+            {imagePreview ? (
+              <div className="relative rounded-xl overflow-hidden border border-border">
+                <img
+                  src={imagePreview}
+                  alt="Report attachment preview"
+                  className="w-full h-48 object-cover"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-2 right-2 rounded-full h-8 w-8"
+                  onClick={removeImage}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1 h-20 flex-col gap-1 rounded-xl"
+                  onClick={() => cameraInputRef.current?.click()}
+                  disabled={isCompressing}
+                >
+                  <Camera className="w-5 h-5" />
+                  <span className="text-xs">Camera</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1 h-20 flex-col gap-1 rounded-xl"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isCompressing}
+                >
+                  <ImagePlus className="w-5 h-5" />
+                  <span className="text-xs">Gallery</span>
+                </Button>
+              </div>
+            )}
+            {isCompressing && (
+              <p className="text-xs text-muted-foreground animate-pulse">Processing image...</p>
+            )}
+            {/* Hidden file inputs */}
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={handleImageSelect}
+            />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageSelect}
             />
           </div>
 
